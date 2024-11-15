@@ -1619,8 +1619,8 @@ namespace DeepNestLib
 
                     }
                     else
-                    {             
-                        nfp = NewMinkowskiSum(B, A, type, true, takeOnlyBiggestArea: false);                        
+                    {
+                        nfp = NewMinkowskiSum(B, A, type, true, takeOnlyBiggestArea: false);
                     }
                 }
             }
@@ -1764,7 +1764,8 @@ namespace DeepNestLib
                     }
                     else
                     {
-                        throw new Exception("trouble .cache allready has such key");
+                        window.nfpCache[key] = Background.cloneNfp(obj.nfp, inner).ToList();
+                        //throw new Exception("trouble .cache allready has such key");
                         //   window.nfpCache[key] = Background.cloneNfp(new[] { obj.nfp }, inner).ToList();
                     }
                 }

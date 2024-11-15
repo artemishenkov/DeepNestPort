@@ -3,6 +3,7 @@ using netDxf;
 using netDxf.Entities;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.IO;
@@ -25,16 +26,25 @@ namespace DeepNestLib
 
 
             netDxf.DxfDocument doc = netDxf.DxfDocument.Load(path);
+            List<EntityObject> remove = new();
+            foreach (var e in doc.Entities.All)
+                if (e.Linetype.Segments.Count > 1)
+                    remove.Add(e);
+            doc.Entities.Remove(remove);
+
             double mult = 1;
             if (doc.DrawingVariables.InsUnits == netDxf.Units.DrawingUnits.Inches)
             {
-                mult = 25.4;
+                foreach (var e in doc.Entities.All)
+                {
+                    e.TransformBy(Matrix3.Scale(25.4), new(0, 0, 0));
+                }
             }
 
             foreach (var polyline2D in doc.Entities.Polylines2D)
             {
                 var cc = new LocalContour();
-                var list = polyline2D.PolygonalVertexes(100);
+                var list = polyline2D.PolygonalVertexes(40);
 
                 cc.Points.AddRange(list.Select(z => new PointF((float)z.X, (float)z.Y)));
                 var p = new PolylineElement
@@ -97,7 +107,7 @@ namespace DeepNestLib
             foreach (var cr in doc.Entities.Splines)
             {
                 LocalContour cc = new LocalContour();
-                var list = cr.PolygonalVertexes(100);
+                var list = cr.PolygonalVertexes(40);
 
                 cc.Points.AddRange(list.Select(z => new PointF((float)(float)z.X, (float)z.Y)));
                 PolylineElement p = new PolylineElement()
@@ -245,5 +255,5 @@ namespace DeepNestLib
             return p1;
         }
 
-    }    
+    }
 }

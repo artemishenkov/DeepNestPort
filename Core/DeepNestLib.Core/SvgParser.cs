@@ -165,9 +165,16 @@ namespace DeepNestLib
         }
 
         public static void Export(string path, IEnumerable<NFP> polygons, IEnumerable<NFP> sheets)
+            => File.WriteAllText(path, Export(polygons, sheets));
+
+
+
+        public static string Export(IEnumerable<NFP> polygons, IEnumerable<NFP> sheets)
         {
+            var width = sheets.Sum(sheet => sheet.WidthCalculated);
+            var height = sheets.Max(sheet => sheet.HeightCalculated);
             StringBuilder sb = new StringBuilder();
-            sb.AppendLine("	<svg version=\"1.1\" id=\"svg2\" xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"   xml:space=\"preserve\">");
+            sb.AppendLine($"	<svg version=\"1.1\" id=\"svg2\" viewBox=\"0 0 {width + sheets.Count() * 10} {height + sheets.Count() * 10}  \"  xmlns=\"http://www.w3.org/2000/svg\" xmlns:xlink=\"http://www.w3.org/1999/xlink\"   xml:space=\"preserve\">");
 
             foreach (var item in polygons.Union(sheets))
             {
@@ -189,7 +196,7 @@ namespace DeepNestLib
                     fill = "none";
                 }
 
-                sb.AppendLine($"<path fill=\"{fill}\"  stroke=\"black\" d=\"");
+                sb.AppendLine($"<path fill=\"{fill}\" stroke-width=\"0.09%\"  stroke=\"black\" d=\"");
                 for (int i = 0; i < points.Count(); i++)
                 {
                     var p = points[i];
@@ -230,7 +237,7 @@ namespace DeepNestLib
 
             }
             sb.AppendLine("</svg>");
-            File.WriteAllText(path, sb.ToString());
+            return sb.ToString();
         }
 
         public static SvgConfig Conf = new SvgConfig();
@@ -430,6 +437,6 @@ namespace DeepNestLib
 
     }
 
-    
+
 
 }
